@@ -1,0 +1,28 @@
+[project]
+name = "stockpilotai"
+version = "0.1.0"
+description = "This is Stock Portfolio Analyzer. It uses AI to analyze portfolio and give suggestions"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.141.1",
+    "numpy>=2.5.1",
+    "ollama>=0.6.2",
+    "pandas>=3.0.5",
+    "pydantic-settings>=2.15.0",
+    "sqlalchemy>=2.0.51",
+    "uvicorn>=0.52.1",
+    "yfinance>=1.5.2",
+]
+
+[project.scripts]
+stockpilotai = "stockpilotai:main"
+
+[build-system]
+requires = ["uv_build>=0.12.2,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
