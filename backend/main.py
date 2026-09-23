@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from backend.api.health import health_router    
+from backend.api.research import research_router
 
 app = FastAPI(
     title="Stock Pilot API",
@@ -16,3 +17,4 @@ def home():
     }
 
 app.include_router(health_router)
+app.include_router(research_router)
