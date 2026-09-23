@@ -1,15 +1,14 @@
-from fastapi import APIRouter
-from backend.repositories.yfinance_market_data import YFinanceMarketDataProvider
-from backend.repositories.yfinance_client import YFinanceClient
+from fastapi import APIRouter, Depends
+
+from backend.api.dependencies import get_research_service
 from backend.services.research import ResearchService
 
 research_router = APIRouter(prefix="/stocks", tags=["Research"])
 
 @research_router.get("/{symbol}/research")
-def get_stock_research(symbol: str):
-    yfinance_client = YFinanceClient()
-    market_data_provider = YFinanceMarketDataProvider(yfinance_client)
-    research_service = ResearchService(market_data_provider)
+def get_stock_research(symbol: str,
+                          service: ResearchService = Depends(get_research_service),
+                          ):
+        return service.get_stock_research(symbol)
 
-    stock_research = research_service.get_stock_research(symbol)
-    return stock_research
+   
