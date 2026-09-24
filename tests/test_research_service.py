@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from backend.repositories.financial_data import FinancialStatement
 from backend.repositories.market_data import StockMarketData
 from backend.services.research import ResearchService
 
@@ -31,4 +31,16 @@ def test_research_service_with_mock_data():
     assert result.pe_ratio == 15.0
     assert result.revenue == 500_000_000.0
     assert result.earnings == 50_000_000.0
-    assert isinstance(result.as_of_date, datetime)      
+    assert isinstance(result.as_of_date, datetime)   
+
+def test_calculate_revenue_analysis():
+    service = ResearchService(MockMarketDataProvider())
+    statements = [
+        FinancialStatement(period=datetime(2025, 3, 31), total_revenue=1000000.0),
+        FinancialStatement(period=datetime(2024, 3, 31), total_revenue=800000.0),
+    ]
+    result = service.calculate_revenue_analysis(statements)
+
+    assert result.current_revenue == 1000000.0
+    assert result.previous_revenue == 800000.0
+    assert result.growth_percentage == 25.0  # ((1000000 - 800000) / 800000) * 100  
