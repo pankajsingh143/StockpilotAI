@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Protocol
 from pydantic import BaseModel
+from backend.repositories.financial_data import FinancialStatement
 
 class StockMarketData(BaseModel):
     symbol: str
@@ -14,3 +15,5 @@ class StockMarketData(BaseModel):
 class MarketDataProvider(Protocol):
     def get_stock_data(self, symbol: str) -> StockMarketData:
         ...
+    def get_financial_statements(self, symbol: str) -> list[FinancialStatement]:
+        ... 
