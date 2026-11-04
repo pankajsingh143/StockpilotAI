@@ -1,4 +1,4 @@
-from backend.models.financial_reserch import RevenueAnalysis, EarningsAnalysis
+from backend.models.financial_research import RevenueAnalysis, EarningsAnalysis
 from backend.repositories.financial_data import FinancialStatement
 
 from backend.repositories.market_data import (MarketDataProvider, 
