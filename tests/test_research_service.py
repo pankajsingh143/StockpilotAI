@@ -44,3 +44,57 @@ def test_calculate_revenue_analysis():
     assert result.current_revenue == 1000000.0
     assert result.previous_revenue == 800000.0
     assert result.growth_percentage == 25.0  # ((1000000 - 800000) / 800000) * 100  
+
+def test_revenue_analysis_with_insufficient_statements():
+    service = ResearchService(MockMarketDataProvider())
+
+    statements = [
+        FinancialStatement(
+            period=datetime(2025, 3, 31),
+            total_revenue=1000000.0,
+        )
+    ]
+
+    result = service.calculate_revenue_analysis(statements)
+
+    assert result.growth_percentage is None
+
+
+def test_revenue_analysis_with_zero_previous_revenue():
+    service = ResearchService(MockMarketDataProvider())
+
+    statements = [
+        FinancialStatement(
+            period=datetime(2025, 3, 31),
+            total_revenue=1000000.0,
+        ),
+        FinancialStatement(
+            period=datetime(2024, 3, 31),
+            total_revenue=0.0,
+        ),
+    ]
+
+    result = service.calculate_revenue_analysis(statements)
+
+    assert result.current_revenue == 1000000.0
+    assert result.previous_revenue == 0.0
+    assert result.growth_percentage is None
+
+
+def test_revenue_analysis_with_missing_revenue():
+    service = ResearchService(MockMarketDataProvider())
+
+    statements = [
+        FinancialStatement(
+            period=datetime(2025, 3, 31),
+            total_revenue=1000000.0,
+        ),
+        FinancialStatement(
+            period=datetime(2024, 3, 31),
+            total_revenue=None,
+        ),
+    ]
+
+    result = service.calculate_revenue_analysis(statements)
+
+    assert result.growth_percentage is None
