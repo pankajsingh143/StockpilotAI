@@ -50,4 +50,50 @@ def test_yfinance_provider_maps_data_to_stock_market_data():
 
     assert result.symbol == "RELIANCE.NS"
     assert result.price == 1500.0
-    
+
+def test_provider_maps_financial_statements():
+    client = MockYFinanceClient()
+    provider = YFinanceMarketDataProvider(client)
+
+    result = provider.get_financial_statements("RELIANCE.NS")
+
+    assert len(result) == 2
+    assert isinstance(result[0], FinancialStatement)
+    assert result[0].total_revenue == 1000000.0
+    assert result[0].net_income == 100000.0
+    assert result[1].total_revenue == 900000.0
+
+def test_provider_handles_missing_financial_metrics():
+    class IncompleteMockClient:
+        def get_income_statement(self, symbol: str):
+            return pd.DataFrame({
+                pd.Timestamp("2026-03-31"): {
+                    "Total Revenue": 1000000.0,
+                    "Net Income": 100000.0,
+                }
+            })
+
+    provider = YFinanceMarketDataProvider(IncompleteMockClient())
+    result = provider.get_financial_statements("RELIANCE.NS")
+
+    assert result[0].total_revenue == 1000000.0
+    assert result[0].net_income == 100000.0
+    assert result[0].gross_profit is None
+    assert result[0].operating_income is None
+    assert result[0].ebitda is None
+
+def test_provider_handles_nan_financial_values():
+    class NaNMockClient:
+        def get_income_statement(self, symbol: str):
+            return pd.DataFrame({
+                pd.Timestamp("2026-03-31"): {
+                    "Total Revenue": float("nan"),
+                    "Net Income": 100000.0,
+                }
+            })
+
+    provider = YFinanceMarketDataProvider(NaNMockClient())
+    result = provider.get_financial_statements("RELIANCE.NS")
+
+    assert result[0].total_revenue is None
+    assert result[0].net_income == 100000.0

@@ -1,3 +1,4 @@
+import pandas as pd
 from backend.repositories.financial_data import FinancialStatement
 from backend.repositories.market_data import StockMarketData
 from backend.repositories.yfinance_client import YFinanceClient
@@ -16,21 +17,35 @@ class YFinanceMarketDataProvider:
             market_cap=data.get("market_cap")
         )
 
+   
     def get_financial_statements(self, symbol: str) -> list[FinancialStatement]:
-        # Fetch financial statements using the yfinance client
-        income_statements = self.yfinance_client.get_financial_statements(symbol)
+        income_statements = self.yfinance_client.get_income_statement(symbol)
         statements = []
+
         for period in income_statements.columns:
+
+            def get_value(row: str) -> float | None:
+                if row not in income_statements.index:
+                    return None
+
+                value = income_statements.loc[row, period]
+
+                if pd.isna(value):
+                    return None
+
+                return float(value)
+
             statements.append(
                 FinancialStatement(
                     period=period.to_pydatetime(),
-                    total_revenue=income_statements.loc["Total Revenue", period],
-                    gross_profit=income_statements.loc.get("Gross Profit", {}).get(period),
-                    operating_income=income_statements.loc.get("Operating Income", {}).get(period),
-                    ebitda=income_statements.loc.get("EBITDA", {}).get(period),
-                    net_income=income_statements.loc["Net Income", period],
-                    basic_eps=income_statements.loc.get("Basic EPS", {}).get(period),
-                    diluted_eps=income_statements.loc.get("Diluted EPS", {}).get(period),
-                )       
+                    total_revenue=get_value("Total Revenue"),
+                    gross_profit=get_value("Gross Profit"),
+                    operating_income=get_value("Operating Income"),
+                    ebitda=get_value("EBITDA"),
+                    net_income=get_value("Net Income"),
+                    basic_eps=get_value("Basic EPS"),
+                    diluted_eps=get_value("Diluted EPS"),
+                )
             )
+
         return statements
