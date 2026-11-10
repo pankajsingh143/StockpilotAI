@@ -1,3 +1,4 @@
+import pytest
 from backend.models.ai_research import AIResearchResponse
 from backend.models.financial_research import (
     FinancialResearchResult,
@@ -42,3 +43,25 @@ def test_ai_research_interprets_financial_metrics():
     assert result.summary == "Revenue growth is positive."
     assert len(result.strengths) == 1
     assert len(result.risks) == 1
+
+
+def test_ai_research_rejects_invalid_json():
+    financial_result = FinancialResearchResult(
+        symbol="RELIANCE.NS",
+        revenue=RevenueAnalysis(
+            current_revenue=1000.0,
+            previous_revenue=800.0,
+            growth_percentage=25.0,
+        ),
+    )
+
+    class InvalidOllamaClient:
+        def generate(self, prompt: str) -> str:
+            return "This is not valid JSON"
+
+    service = AIResearchService(
+        ollama_client=InvalidOllamaClient()
+    )
+
+    with pytest.raises(ValueError):
+        service.analyze(financial_result)
