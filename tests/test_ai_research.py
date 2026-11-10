@@ -22,7 +22,8 @@ class MockOllamaClient:
             "symbol": "RELIANCE.NS",
             "summary": "Revenue growth is positive.",
             "strengths": ["Revenue increased by 25%"],
-            "risks": ["Profitability requires further investigation"]
+            "risks": ["Profitability requires further investigation"],
+            "observations": ["Revenue increased by 25%"]
         }
         """
 
@@ -48,6 +49,7 @@ def test_ai_research_interprets_financial_metrics():
     assert result.summary == "Revenue growth is positive."
     assert len(result.strengths) == 1
     assert len(result.risks) == 1
+    assert result.observations == ["Revenue increased by 25%"]
 
 
 def test_ai_research_rejects_invalid_json():
@@ -87,7 +89,8 @@ def test_ai_research_rejects_invalid_json():
                 "symbol": "📊",
                 "summary": "Revenue is growing.",
                 "strengths": ["Revenue growth is positive"],
-                "risks": ["Profitability needs review"]
+                "risks": ["Profitability needs review"],
+                "observations": ["Revenue growth is 25%"]
             }
             """
 
@@ -130,7 +133,8 @@ def test_ai_research_includes_all_financial_metrics():
                 "symbol": "incorrect",
                 "summary": "Revenue growth exceeds profit growth.",
                 "strengths": ["Revenue growth is positive"],
-                "risks": ["Profit growth is slower than revenue growth"]
+                "risks": ["Profit growth is slower than revenue growth"],
+                "observations": ["Revenue growth is 30%"]
             }
             """
 

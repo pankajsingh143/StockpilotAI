@@ -70,6 +70,10 @@ def test_get_ai_stock_research():
                 summary="Revenue growth exceeds profit growth.",
                 strengths=["Revenue growth is 30%"],
                 risks=["Profit growth is only 5%"],
+                observations=[
+                    "Revenue growth is 30%.",
+                    "Profit growth is 5%.",
+                ],
             )
 
     app.dependency_overrides[get_research_service] = (
@@ -90,6 +94,10 @@ def test_get_ai_stock_research():
         assert data["summary"] == "Revenue growth exceeds profit growth."
         assert data["strengths"] == ["Revenue growth is 30%"]
         assert data["risks"] == ["Profit growth is only 5%"]
+        assert data["observations"] == [
+            "Revenue growth is 30%.",
+            "Profit growth is 5%.",
+        ]
 
     finally:
         app.dependency_overrides.clear()

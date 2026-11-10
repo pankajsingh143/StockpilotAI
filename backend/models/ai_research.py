@@ -5,3 +5,4 @@ class AIResearchResponse(BaseModel):
     summary: str | None = None
     strengths: list[str] | None = None
     risks: list[str] | None = None  
+    observations: list[str] 

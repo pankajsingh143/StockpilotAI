@@ -47,6 +47,13 @@ class AIResearchPromptBuilder:
             5. Explicitly mention when important metrics are unavailable.
             6. Provide a concise summary.
             7. Do not provide buy or sell recommendations.
+            8. Include meaningful comparisons between revenue growth,
+                net profit growth and EPS growth in the observations array.
+                If no meaningful observation can be established, return
+                an empty observations array.
+
+            9. Never describe one growth rate as higher or lower than
+                another without correctly comparing their numerical values.
 
             Strict rules:
 
@@ -59,6 +66,33 @@ class AIResearchPromptBuilder:
             7. Present possible explanations only as hypotheses requiring further investigation.
             8. Do not describe revenue growth alone as proof of strong financial health.
             9. Do not invent strengths or risks when the data does not support them.
+            10. When net profit growth exceeds revenue growth,
+                identify this as positive profit-growth divergence,
+                not automatically as a risk.
+
+            11. Do not attribute higher profit growth to cost
+                efficiency, margin improvement or profit optimization
+                unless supporting historical metrics are supplied.
+
+            12. Classify differences between financial growth rates
+                as observations. Only classify them as risks when
+                supporting evidence indicates a potential weakness.
+            13. Never describe a metric as increasing or decreasing
+                unless both current and previous values are available.
+
+            14. When previous-period values are unavailable, describe
+                only the current-period value and explicitly state
+                that a trend cannot be established.
+
+            15. When net profit growth and EPS growth move in opposite
+                directions, identify the divergence as an observation
+                requiring further investigation. Do not invent its cause.
+
+            16. Distinguish operating margin from net margin. A positive
+                net margin does not negate a negative operating margin.
+
+            17. Do not infer operating efficiency deterioration from
+                a single negative operating margin observation.
 
             Return only valid JSON in this exact structure:
 
