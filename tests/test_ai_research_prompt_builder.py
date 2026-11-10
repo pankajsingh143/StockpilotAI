@@ -37,6 +37,7 @@ def test_build_prompt_includes_symbol_and_all_financial_metrics():
     assert "eps_growth_percentage" in prompt
     assert "9.09" in prompt
     assert '"symbol": "RELIANCE.NS"' in prompt
+    assert "Compare EPS growth with revenue growth and net profit growth" in prompt
 
 
 def test_build_prompt_marks_missing_metrics_as_unavailable():

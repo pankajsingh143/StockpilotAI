@@ -18,7 +18,7 @@ class AIResearchService:
 
         response = self.ollama_client.generate(
             prompt=prompt,
-            format = AIResearchResponse.model_json_schema(),
+            format=AIResearchResponse.model_json_schema(),
             )
 
         result = json.loads(response)
