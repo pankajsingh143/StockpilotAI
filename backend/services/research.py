@@ -1,4 +1,4 @@
-from backend.models.financial_research import RevenueAnalysis, EarningsAnalysis, ProfitabilityAnalysis
+from backend.models.financial_research import RevenueAnalysis, EarningsAnalysis, ProfitabilityAnalysis, FinancialResearchResult
 from backend.repositories.financial_data import FinancialStatement
 
 from backend.repositories.market_data import (MarketDataProvider, 
@@ -127,5 +127,18 @@ class ResearchService:
             eps_growth_percentage=eps_growth,
         )
 
+    def get_financial_research_result(
+        self,
+        symbol: str,
+    ) -> FinancialResearchResult:
+
+        statements = self.market_data_provider.get_financial_statements(symbol)
+
+        return FinancialResearchResult(
+            symbol=symbol,
+            revenue=self.calculate_revenue_analysis(statements),
+            profitability=self.calculate_profitability_analysis(statements),
+            earnings=self.calculate_earnings_analysis(statements),
+        )
 
             
