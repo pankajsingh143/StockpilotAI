@@ -1,4 +1,6 @@
 from datetime import datetime
+
+import pytest
 from backend.repositories.financial_data import FinancialStatement
 from backend.repositories.market_data import StockMarketData
 from backend.services.research import ResearchService
@@ -470,5 +472,49 @@ def test_earnings_analysis_with_insufficient_statements():
     assert result.current_eps is None
     assert result.previous_eps is None
     assert result.eps_growth_percentage is None
+
+
+from backend.models.financial_research import FinancialResearchResult
+
+
+class MockFinancialDataProvider(MockMarketDataProvider):
+    def get_financial_statements(self, symbol: str) -> list[FinancialStatement]:
+        return [
+            FinancialStatement(
+                period=datetime(2025, 3, 31),
+                total_revenue=1300.0,
+                net_income=105.0,
+                operating_income=150.0,
+                basic_eps=12.0,
+            ),
+            FinancialStatement(
+                period=datetime(2024, 3, 31),
+                total_revenue=1000.0,
+                net_income=100.0,
+                operating_income=120.0,
+                basic_eps=11.0,
+            ),
+        ]
+
+
+def test_get_financial_research_result():
+    service = ResearchService(MockFinancialDataProvider())
+
+    result = service.get_financial_research_result("RELIANCE.NS")
+
+    assert isinstance(result, FinancialResearchResult)
+    assert result.symbol == "RELIANCE.NS"
+
+    assert result.revenue.growth_percentage == 30.0
+
+    assert result.profitability.net_profit == 105.0
+    assert result.profitability.profit_growth_percentage == 5.0
+    assert result.profitability.operating_margin_percentage == pytest.approx(11.53846, rel=1e-5)
+    assert result.profitability.net_margin_percentage == pytest.approx(8.07692, rel=1e-5)
+
+    assert result.earnings.current_eps == 12.0
+    assert result.earnings.previous_eps == 11.0
+    assert result.earnings.eps_growth_percentage == pytest.approx(9.090909, rel=1e-5)
+
 
    
