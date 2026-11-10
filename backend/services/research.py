@@ -1,4 +1,4 @@
-from backend.models.financial_research import RevenueAnalysis, EarningsAnalysis
+from backend.models.financial_research import RevenueAnalysis, EarningsAnalysis, ProfitabilityAnalysis
 from backend.repositories.financial_data import FinancialStatement
 
 from backend.repositories.market_data import (MarketDataProvider, 
@@ -33,3 +33,99 @@ class ResearchService:
             previous_revenue=previous.total_revenue,
             growth_percentage=growth_percentage
         )
+    
+    def calculate_profitability_analysis(
+        self,
+        statements: list[FinancialStatement],
+    ) -> ProfitabilityAnalysis:
+
+        if len(statements) < 2:
+            return ProfitabilityAnalysis()
+
+        ordered_statements = sorted(
+            statements,
+            key=lambda x: x.period,
+            reverse=True,
+        )
+
+        current = ordered_statements[0]
+        previous = ordered_statements[1]
+
+        profit_growth = None
+
+        if (
+            current.net_income is not None
+            and previous.net_income is not None
+            and previous.net_income > 0
+        ):
+            profit_growth = (
+                (current.net_income - previous.net_income)
+                / abs(previous.net_income)
+            ) * 100
+
+        operating_margin = None
+
+        if (
+            current.operating_income is not None
+            and current.total_revenue is not None
+            and current.total_revenue != 0
+        ):
+            operating_margin = (
+                current.operating_income / current.total_revenue
+            ) * 100
+
+        net_margin = None
+
+        if (
+            current.net_income is not None
+            and current.total_revenue is not None
+            and current.total_revenue != 0
+        ):
+            net_margin = (
+                current.net_income / current.total_revenue
+            ) * 100
+
+        return ProfitabilityAnalysis(
+            net_profit=current.net_income,
+            profit_growth_percentage=profit_growth,
+            operating_margin_percentage=operating_margin,
+            net_margin_percentage=net_margin,
+        )
+    
+    def calculate_earnings_analysis(
+        self,
+        statements: list[FinancialStatement],
+    ) -> EarningsAnalysis:
+
+        if len(statements) < 2:
+            return EarningsAnalysis()
+
+        ordered_statements = sorted(
+            statements,
+            key=lambda x: x.period,
+            reverse=True,
+        )
+
+        current = ordered_statements[0]
+        previous = ordered_statements[1]
+
+        eps_growth = None
+
+        if (
+            current.basic_eps is not None
+            and previous.basic_eps is not None
+            and previous.basic_eps > 0
+        ):
+            eps_growth = (
+                (current.basic_eps - previous.basic_eps)
+                / previous.basic_eps
+            ) * 100
+
+        return EarningsAnalysis(
+            current_eps=current.basic_eps,
+            previous_eps=previous.basic_eps,
+            eps_growth_percentage=eps_growth,
+        )
+
+
+            
