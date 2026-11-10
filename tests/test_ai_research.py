@@ -1,0 +1,44 @@
+from backend.models.ai_research import AIResearchResponse
+from backend.models.financial_research import (
+    FinancialResearchResult,
+    RevenueAnalysis,
+)
+from backend.services.ai_research import AIResearchService
+
+
+class MockOllamaClient:
+    def generate(self, prompt: str) -> str:
+        assert "RELIANCE.NS" in prompt
+        assert "25.0" in prompt
+
+        return """
+        {
+            "symbol": "RELIANCE.NS",
+            "summary": "Revenue growth is positive.",
+            "strengths": ["Revenue increased by 25%"],
+            "risks": ["Profitability requires further investigation"]
+        }
+        """
+
+
+def test_ai_research_interprets_financial_metrics():
+    financial_result = FinancialResearchResult(
+        symbol="RELIANCE.NS",
+        revenue=RevenueAnalysis(
+            current_revenue=1000.0,
+            previous_revenue=800.0,
+            growth_percentage=25.0,
+        ),
+    )
+
+    service = AIResearchService(
+        ollama_client=MockOllamaClient()
+    )
+
+    result = service.analyze(financial_result)
+
+    assert isinstance(result, AIResearchResponse)
+    assert result.symbol == "RELIANCE.NS"
+    assert result.summary == "Revenue growth is positive."
+    assert len(result.strengths) == 1
+    assert len(result.risks) == 1

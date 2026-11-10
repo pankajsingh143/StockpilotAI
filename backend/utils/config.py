@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     app_version: str
 
     ollama_base_url: str 
+    ollama_model: str = "phi4-mini:latest"
 
     database_url: str 
 
