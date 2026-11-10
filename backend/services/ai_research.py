@@ -30,6 +30,16 @@ class AIResearchService:
         4. Distinguish facts from possible explanations.
         5. Do not provide buy or sell recommendations.
 
+        STRICT RULES:
+        1. Do not generate or modify the stock symbol.
+        2. The application will populate the symbol.
+        3. Only use financial metrics explicitly supplied.
+        4. Do not infer market share, demand, expansion or other unsupported facts.
+        5. Describe observations as facts only when directly supported by the supplied figures.
+        6. Present possible explanations as hypotheses requiring investigation.
+        7. Include a concise summary.
+        8. Return at least one strength and one risk only when supported by the data.
+
         Return only valid JSON in this exact structure:
         {{
             "symbol": "{financial_result.symbol}",
@@ -45,5 +55,6 @@ class AIResearchService:
             )
 
         result = json.loads(response)
+        result["symbol"] = financial_result.symbol  # Ensure the symbol is set correctly    
 
         return AIResearchResponse.model_validate(result)

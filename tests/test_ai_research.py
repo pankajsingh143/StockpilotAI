@@ -68,3 +68,31 @@ def test_ai_research_rejects_invalid_json():
 
     with pytest.raises(ValueError):
         service.analyze(financial_result)
+    def test_ai_research_overrides_model_generated_symbol():
+        financial_result = FinancialResearchResult(
+            symbol="RELIANCE.NS",
+            revenue=RevenueAnalysis(
+                current_revenue=1000.0,
+                previous_revenue=800.0,
+                growth_percentage=25.0,
+            ),
+        )
+
+    class IncorrectSymbolClient:
+        def generate(self, prompt: str, format=None) -> str:
+            return """
+            {
+                "symbol": "📊",
+                "summary": "Revenue is growing.",
+                "strengths": ["Revenue growth is positive"],
+                "risks": ["Profitability needs review"]
+            }
+            """
+
+    service = AIResearchService(
+        ollama_client=IncorrectSymbolClient()
+    )
+
+    result = service.analyze(financial_result)
+
+    assert result.symbol == "RELIANCE.NS"
