@@ -8,7 +8,10 @@ from backend.services.ai_research import AIResearchService
 
 
 class MockOllamaClient:
-    def generate(self, prompt: str) -> str:
+    def generate(self, prompt: str, format=None) -> str:
+        assert format is not None
+        assert format["type"] == "object"
+        assert "summary" in format["properties"]
         assert "RELIANCE.NS" in prompt
         assert "25.0" in prompt
 
@@ -56,7 +59,7 @@ def test_ai_research_rejects_invalid_json():
     )
 
     class InvalidOllamaClient:
-        def generate(self, prompt: str) -> str:
+        def generate(self, prompt: str, format=None) -> str:
             return "This is not valid JSON"
 
     service = AIResearchService(

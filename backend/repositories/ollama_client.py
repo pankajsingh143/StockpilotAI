@@ -5,6 +5,12 @@ class OllamaClient:
     self.client = client or Client(host=base_url)
     self.model = model
 
-  def generate(self, prompt: str) -> str:
-    result = self.client.generate(model=self.model, prompt=prompt)
+  def generate(self, prompt: str, format: dict | str | None = None) -> str:
+    options = {
+      "model": self.model,
+      "prompt": prompt
+    }
+    if format is not None:
+      options["format"] = format
+    result = self.client.generate(**options)
     return result.response

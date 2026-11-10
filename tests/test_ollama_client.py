@@ -47,3 +47,34 @@ def test_initializes_sdk_client_with_base_url(monkeypatch):
     assert captured["host"] == "http://localhost:11434"
     assert ollama_client.client is mock_client
     assert ollama_client.model == "phi4-mini:latest"
+    
+def test_generate_passes_json_schema_to_ollama():
+    captured = {}
+
+    class StructuredMockClient:
+        def generate(self, **kwargs):
+            captured.update(kwargs)
+            return SimpleNamespace(response='{"summary": "Test"}')
+
+    schema = {
+        "type": "object",
+        "properties": {
+            "summary": {"type": "string"}
+        },
+        "required": ["summary"],
+    }
+
+    ollama_client = OllamaClient(
+        base_url="http://localhost:11434",
+        model="phi4-mini:latest",
+        client=StructuredMockClient(),
+    )
+
+    result = ollama_client.generate(
+        prompt="Generate structured output",
+        format=schema,
+    )
+
+    assert captured["format"] == schema
+    assert captured["model"] == "phi4-mini:latest"
+    assert result == '{"summary": "Test"}'
